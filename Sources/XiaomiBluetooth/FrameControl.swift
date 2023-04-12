@@ -71,12 +71,17 @@ extension MiBeacon.FrameControl {
     /// Returns a FrameControl instance with the version bits set based on the input version number.
     ///
     /// - Parameter version: The version number to use. Must be a value between 0 and 15.
-    static func version(_ version: Int) -> MiBeacon.FrameControl {
+    static func version(_ version: UInt8) -> MiBeacon.FrameControl {
         return MiBeacon.FrameControl(rawValue: UInt16(version & 0b1111) << 12)
     }
     
     /// A FrameControl instance with the mesh and capabilityInclude bits set to 1.
     static var meshAccess: MiBeacon.FrameControl {
         return [mesh, capabilityInclude]
+    }
+    
+    /// SDK version
+    var version: UInt8 {
+        UInt8(rawValue >> 12)
     }
 }
