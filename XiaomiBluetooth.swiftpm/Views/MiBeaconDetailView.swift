@@ -156,10 +156,96 @@ extension MiBeaconDetailView {
             ]
         }
         
+        // read device information
+        var deviceInformationService = ServiceSection(
+            id: .deviceInformation,
+            name: "Device Information",
+            characteristics: []
+        )
+        if let characteristic = connection.cache.characteristic(.manufacturerNameString, service: .deviceInformation) {
+            let data = try await connection.central.readValue(for: characteristic)
+            guard let value = String(data: data, encoding: .utf8) else {
+                throw XiaomiBluetoothAppError.invalidCharacteristicValue(.manufacturerNameString)
+            }
+            deviceInformationService.characteristics.append(
+                CharacteristicItem(
+                    id: BluetoothUUID.manufacturerNameString.rawValue,
+                    name: "Manufacturer Name",
+                    value: value
+                )
+            )
+        }
+        if let characteristic = connection.cache.characteristic(.modelNumberString, service: .deviceInformation) {
+            let data = try await connection.central.readValue(for: characteristic)
+            guard let value = String(data: data, encoding: .utf8) else {
+                throw XiaomiBluetoothAppError.invalidCharacteristicValue(.modelNumberString)
+            }
+            deviceInformationService.characteristics.append(
+                CharacteristicItem(
+                    id: BluetoothUUID.modelNumberString.rawValue,
+                    name: "Model",
+                    value: value
+                )
+            )
+        }
+        if let characteristic = connection.cache.characteristic(.serialNumberString, service: .deviceInformation) {
+            let data = try await connection.central.readValue(for: characteristic)
+            guard let value = String(data: data, encoding: .utf8) else {
+                throw XiaomiBluetoothAppError.invalidCharacteristicValue(.serialNumberString)
+            }
+            deviceInformationService.characteristics.append(
+                CharacteristicItem(
+                    id: BluetoothUUID.serialNumberString.rawValue,
+                    name: "Serial Number",
+                    value: value
+                )
+            )
+        }
+        if let characteristic = connection.cache.characteristic(.firmwareRevisionString, service: .deviceInformation) {
+            let data = try await connection.central.readValue(for: characteristic)
+            guard let value = String(data: data, encoding: .utf8) else {
+                throw XiaomiBluetoothAppError.invalidCharacteristicValue(.firmwareRevisionString)
+            }
+            deviceInformationService.characteristics.append(
+                CharacteristicItem(
+                    id: BluetoothUUID.firmwareRevisionString.rawValue,
+                    name: "Firmware Revision",
+                    value: value
+                )
+            )
+        }
+        if let characteristic = connection.cache.characteristic(.hardwareRevisionString, service: .deviceInformation) {
+            let data = try await connection.central.readValue(for: characteristic)
+            guard let value = String(data: data, encoding: .utf8) else {
+                throw XiaomiBluetoothAppError.invalidCharacteristicValue(.hardwareRevisionString)
+            }
+            deviceInformationService.characteristics.append(
+                CharacteristicItem(
+                    id: BluetoothUUID.hardwareRevisionString.rawValue,
+                    name: "Hardware Revision",
+                    value: value
+                )
+            )
+        }
+        if let characteristic = connection.cache.characteristic(.softwareRevisionString, service: .deviceInformation) {
+            let data = try await connection.central.readValue(for: characteristic)
+            guard let value = String(data: data, encoding: .utf8) else {
+                throw XiaomiBluetoothAppError.invalidCharacteristicValue(.softwareRevisionString)
+            }
+            deviceInformationService.characteristics.append(
+                CharacteristicItem(
+                    id: BluetoothUUID.softwareRevisionString.rawValue,
+                    name: "Software Revision",
+                    value: value
+                )
+            )
+        }
+        
         // set services
         self.services = [
+            thermometerService,
             batteryService,
-            thermometerService
+            deviceInformationService
         ]
         .filter { $0.characteristics.isEmpty == false }
     }
