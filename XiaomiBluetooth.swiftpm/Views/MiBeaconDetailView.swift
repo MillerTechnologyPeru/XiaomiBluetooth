@@ -23,7 +23,7 @@ struct MiBeaconDetailView: View {
     private var store: Store
     
     @State
-    var reloadTask: Task<Void, Never>?
+    private var reloadTask: Task<Void, Never>?
     
     @State
     private var error: String?
@@ -39,6 +39,9 @@ struct MiBeaconDetailView: View {
     
     @State
     private var ioCapability: MiBeacon.Capability.IO = []
+    
+    @State
+    private var services = [ServiceSection]()
     
     init(
         peripheral: NativePeripheral,
@@ -58,7 +61,8 @@ struct MiBeaconDetailView: View {
             address: address,
             version: version,
             capability: capability,
-            ioCapability: ioCapability
+            ioCapability: ioCapability,
+            services: services
         )
         .refreshable {
             reload()
@@ -88,11 +92,66 @@ extension MiBeaconDetailView {
                 self.address = beacons.compactMapValues { $0.address }.values.first
                 self.capability = beacons.compactMap { $0.value.capability }.first ?? []
                 self.ioCapability = beacons.compactMap { $0.value.ioCapability }.first ?? []
+                // read characteristics
+                try await store.central.connection(for: peripheral) { connection in
+                    try await readCharacteristics(connection: connection)
+                }
             }
             catch {
                 self.error = error.localizedDescription
             }
         }
+    }
+    
+    func readCharacteristics(connection: GATTConnection<NativeCentral>) async throws {
+        var batteryService = ServiceSection(
+            id: .batteryService,
+            name: "Battery Service",
+            characteristics: []
+        )
+        
+        // read battery level
+        if let characteristic = connection.cache.characteristic(.batteryLevel, service: .batteryService) {
+            let data = try await connection.central.readValue(for: characteristic)
+            guard data.count == 1 else {
+                throw XiaomiBluetoothAppError.invalidCharacteristicValue(.batteryLevel)
+            }
+            let value = data[0]
+            batteryService.characteristics.append(
+                CharacteristicItem(
+                    id: characteristic.uuid,
+                    name: "Battery Level",
+                    value: "\(value)%"
+                )
+            )
+        }
+        
+        // read temperature and humidity
+        var thermometerService = ServiceSection(
+            id: TemperatureHumidityCharacteristic.service,
+            name: "Mi Thermometer Service",
+            characteristics: []
+        )
+        if let characteristic = connection.cache.characteristic(TemperatureHumidityCharacteristic.uuid, service: TemperatureHumidityCharacteristic.service) {
+            let data = try await connection.central.readValue(for: characteristic)
+            guard let value = TemperatureHumidityCharacteristic(data: data) else {
+                throw XiaomiBluetoothAppError.invalidCharacteristicValue(TemperatureHumidityCharacteristic.uuid)
+            }
+            thermometerService.characteristics += [
+                CharacteristicItem(
+                    id: characteristic.uuid,
+                    name: "Temperature",
+                    value: value.temperature.description
+                )
+            ]
+        }
+        
+        // set services
+        self.services = [
+            batteryService,
+            thermometerService
+        ]
+        .filter { $0.characteristics.isEmpty == false }
     }
 }
 
@@ -110,6 +169,8 @@ extension MiBeaconDetailView {
         
         let ioCapability: MiBeacon.Capability.IO
         
+        let services: [ServiceSection]
+        
         var body: some View {
             List {
                 Section("Advertisement") {
@@ -123,6 +184,7 @@ extension MiBeaconDetailView {
                         title: Text("Version"),
                         subtitle: Text(verbatim: version.description)
                     )
+                    #if DEBUG
                     if capability.isEmpty == false {
                         SubtitleRow(
                             title: Text("Capability"),
@@ -135,9 +197,41 @@ extension MiBeaconDetailView {
                             subtitle: Text(verbatim: ioCapability.description)
                         )
                     }
+                    #endif
+                }
+                ForEach(services) { service in
+                    Section(service.name) {
+                        ForEach(service.characteristics) { characteristic in
+                            SubtitleRow(
+                                title: Text(characteristic.name),
+                                subtitle: Text(verbatim: characteristic.value)
+                            )
+                        }
+                    }
                 }
             }
             .navigationTitle("\(product.description)")
         }
+    }
+}
+
+extension MiBeaconDetailView {
+    
+    struct ServiceSection: Equatable, Identifiable {
+        
+        let id: BluetoothUUID
+        
+        let name: LocalizedStringKey
+        
+        var characteristics: [CharacteristicItem]
+    }
+    
+    struct CharacteristicItem: Equatable, Identifiable {
+        
+        let id: BluetoothUUID
+        
+        let name: LocalizedStringKey
+        
+        let value: String
     }
 }
