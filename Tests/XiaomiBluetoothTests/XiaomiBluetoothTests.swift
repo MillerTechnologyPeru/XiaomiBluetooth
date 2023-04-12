@@ -18,7 +18,7 @@ final class XiaomiBluetoothTests: XCTestCase {
         XCTAssertEqual(beacon.address?.description, "A4:C1:38:78:3C:8D")
         XCTAssertFalse(beacon.isEncrypted)
         XCTAssertEqual(beacon.version, 5)
+        XCTAssertEqual(beacon.capability, [.noBinding, .frontBinding])
         
-        print(beacon)
     }
 }
