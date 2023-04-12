@@ -99,7 +99,7 @@ public extension TemperatureHumidityCharacteristic.Humidity {
 extension TemperatureHumidityCharacteristic.Humidity: CustomStringConvertible {
     
     public var description: String {
-        return "\(rawValue) %"
+        return "\(rawValue)%"
     }
 }
 
