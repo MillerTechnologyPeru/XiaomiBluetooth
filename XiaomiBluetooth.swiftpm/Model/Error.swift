@@ -12,7 +12,18 @@ import XiaomiBluetooth
 /// XiaomiBluetooth app errors.
 public enum XiaomiBluetoothAppError: Error {
     
+    /// Bluetooth is not available on this device.
     case bluetoothUnavailable
     
-    case unknownPeripheral(BluetoothAddress)
+    /// No service with UUID found.
+    case serviceNotFound(BluetoothUUID)
+    
+    /// No characteristic with UUID found.
+    case characteristicNotFound(BluetoothUUID)
+    
+    /// The characteristic's value could not be parsed. Invalid data.
+    case invalidCharacteristicValue(BluetoothUUID)
+    
+    /// Not a compatible peripheral
+    case incompatiblePeripheral
 }
