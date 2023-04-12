@@ -43,4 +43,24 @@ final class XiaomiBluetoothTests: XCTestCase {
         
         print(beacon)
     }
+    
+    func testCharacteristic() {
+        
+        /*
+         Apr 12 02:26:34.992  ATT Receive      0x004C  A4:C1:38:78:3C:8D  Read Response - EBE0CCC1-7A0A-4B0C-8A1A-6FF2997DA3A6 - Value: 9209 3D6F 0B
+             Read Response - EBE0CCC1-7A0A-4B0C-8A1A-6FF2997DA3A6 - Value: 9209 3D6F 0B
+             Opcode: 0x0B
+             Value: 9209 3D6F 0B
+         */
+        
+        let data = Data([0x92, 0x09, 0x3D, 0x6F, 0x0B])
+        guard let value = TemperatureHumidityCharacteristic(data: data) else {
+            XCTFail()
+            return
+        }
+        XCTAssertEqual(type(of: value).uuid.rawValue, "EBE0CCC1-7A0A-4B0C-8A1A-6FF2997DA3A6")
+        XCTAssertEqual(value.temperature.celcius, 24.50)
+        XCTAssertEqual(value.humidity.rawValue, 61)
+        XCTAssertEqual(value.batteryVoltage.voltage, 2.927)
+    }
 }
