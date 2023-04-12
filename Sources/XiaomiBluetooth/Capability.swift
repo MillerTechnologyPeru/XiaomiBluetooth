@@ -47,14 +47,35 @@ public extension MiBeacon.Capability {
     static var io: MiBeacon.Capability { MiBeacon.Capability(rawValue: 1 << 5) }
 }
 
+extension MiBeacon.Capability: CustomStringConvertible {
+    
+    @inline(never)
+    public var description: String {
+      let descriptions: [(Element, StaticString)] = [
+        (.connectable, ".connectable"),
+        (.encryptable, ".encryptable"),
+        (.noBinding, ".noBinding"),
+        (.frontBinding, ".frontBinding"),
+        (.backBinding, ".backBinding"),
+        (.comboBinding, ".comboBinding"),
+        (.io, ".io")
+      ]
+
+      return _buildDescription(descriptions)
+    }
+    
+    /// A textual representation of the file permissions, suitable for debugging.
+    public var debugDescription: String { self.description }
+}
+
 public extension MiBeacon.Capability {
     
     /// An option set that represents the input/output capabilities of a device.
     struct IO: OptionSet, Equatable, Hashable {
         
-        public let rawValue: UInt8
+        public let rawValue: UInt16
         
-        public init(rawValue: UInt8) {
+        public init(rawValue: UInt16) {
             self.rawValue = rawValue
         }
     }
@@ -101,4 +122,26 @@ public extension MiBeacon.Capability.IO {
     static var qrCodeWrite: MiBeacon.Capability.IO {
         MiBeacon.Capability.IO(rawValue: 1 << 7)
     }
+}
+
+extension MiBeacon.Capability.IO: CustomStringConvertible {
+    
+    @inline(never)
+    public var description: String {
+      let descriptions: [(Element, StaticString)] = [
+        (.digitsInput, ".digitsInput"),
+        (.lettersInput, ".lettersInput"),
+        (.nfcRead, ".nfcRead"),
+        (.qrCodeRead, ".qrCodeRead"),
+        (.digitsOutput, ".digitsOutput"),
+        (.lettersOutput, ".lettersOutput"),
+        (.nfcWrite, ".nfcWrite"),
+        (.qrCodeWrite, ".qrCodeWrite")
+      ]
+
+      return _buildDescription(descriptions)
+    }
+    
+    /// A textual representation of the file permissions, suitable for debugging.
+    public var debugDescription: String { self.description }
 }
