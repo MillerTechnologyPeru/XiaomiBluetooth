@@ -119,7 +119,7 @@ extension MiBeaconDetailView {
             let value = data[0]
             batteryService.characteristics.append(
                 CharacteristicItem(
-                    id: characteristic.uuid,
+                    id: characteristic.uuid.rawValue,
                     name: "Battery Level",
                     value: "\(value)%"
                 )
@@ -139,9 +139,19 @@ extension MiBeaconDetailView {
             }
             thermometerService.characteristics += [
                 CharacteristicItem(
-                    id: characteristic.uuid,
+                    id: characteristic.uuid.rawValue + "-" + "Temperature",
                     name: "Temperature",
                     value: value.temperature.description
+                ),
+                CharacteristicItem(
+                    id: characteristic.uuid.rawValue + "-" + "Humidity",
+                    name: "Humidity",
+                    value: value.humidity.description
+                ),
+                CharacteristicItem(
+                    id: characteristic.uuid.rawValue + "-" + "BatteryVoltage",
+                    name: "Battery Voltage",
+                    value: value.batteryVoltage.description
                 )
             ]
         }
@@ -228,7 +238,7 @@ extension MiBeaconDetailView {
     
     struct CharacteristicItem: Equatable, Identifiable {
         
-        let id: BluetoothUUID
+        let id: String
         
         let name: LocalizedStringKey
         
