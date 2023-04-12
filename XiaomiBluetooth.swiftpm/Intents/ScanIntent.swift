@@ -39,10 +39,13 @@ struct ScanIntent: AppIntent {
         let store = Store.shared
         try await store.central.wait(for: .poweredOn, warning: 2, timeout: 5)
         try await store.scan(duration: duration)
-        let advertisements = store.peripherals
-            .lazy
-            .sorted(by: { $0.key.description < $1.key.description })
-            .map { $0.value }
+        let advertisements = store.peripherals.values.reduce(into: [], { (array, peripherals) in
+            peripherals.values
+                .sorted(by: { $0.frameCounter < $1.frameCounter })
+                .sorted(by: { $0.address != nil && $1.address == nil })
+                .first
+                .flatMap { array.append($0) }
+        })
         let results = advertisements.map {
             $0.id
         }

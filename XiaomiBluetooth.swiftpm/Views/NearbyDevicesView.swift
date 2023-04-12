@@ -7,6 +7,8 @@
 
 import Foundation
 import SwiftUI
+import Bluetooth
+import GATT
 import XiaomiBluetooth
 
 struct NearbyDevicesView: View {
@@ -49,11 +51,42 @@ private extension NearbyDevicesView {
         case stopScan
     }
     
-    var items: [MiBeacon] {
-        store.peripherals
-            .lazy
-            .sorted(by: { $0.key.description < $1.key.description })
-            .map { $0.value }
+    struct Item: Equatable, Hashable, Identifiable {
+        
+        var id: NativePeripheral.ID {
+            peripheral.id
+        }
+        
+        let peripheral: NativePeripheral
+        
+        let product: ProductID
+        
+        let address: BluetoothAddress?
+        
+        let version: UInt8
+    }
+    
+    var items: [Item] {
+        var items = [Item]()
+        items.reserveCapacity(store.peripherals.count)
+        for (peripheral, beacons) in store.peripherals {
+            let _ = beacons
+                .values
+                .sorted(by: { $0.frameCounter < $1.frameCounter })
+                .sorted(by: { $0.address != nil && $1.address == nil })
+                .first
+                .flatMap { beacon in
+                    items.append(
+                        Item(
+                            peripheral: peripheral,
+                            product: beacon.product,
+                            address: beacon.address,
+                            version: beacon.version
+                        )
+                    )
+                }
+        }
+        return items
     }
     
     var state: ScanState {
@@ -90,8 +123,20 @@ private extension NearbyDevicesView {
     
     var list: some View {
         List {
-            ForEach(items) {
-                MiBeaconAdvertisementRow(product: $0.product, address: $0.address)
+            ForEach(items) { item in
+                NavigationLink(destination: {
+                    MiBeaconDetailView(
+                        peripheral: item.peripheral,
+                        product: item.product,
+                        version: item.version,
+                        address: item.address
+                    )
+                }, label: {
+                    MiBeaconAdvertisementRow(
+                        product: item.product,
+                        address: item.address
+                    )
+                })
             }
         }
     }

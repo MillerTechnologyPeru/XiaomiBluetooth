@@ -25,7 +25,7 @@ public final class Store: ObservableObject {
     public private(set) var isScanning = false
     
     @Published
-    public private(set) var peripherals = [NativeCentral.Peripheral: MiBeacon]()
+    public private(set) var peripherals = [NativeCentral.Peripheral: [UInt8: MiBeacon]]()
     
     lazy var central = NativeCentral()
     
@@ -44,7 +44,7 @@ public final class Store: ObservableObject {
     
     /// The Bluetooth LE peripheral for the speciifed device identifier..
     subscript (peripheral address: BluetoothAddress) -> NativeCentral.Peripheral? {
-        return peripherals.first(where: { $0.value.address == address })?.key
+        return peripherals.first(where: { $0.value.values.first?.address == address })?.key
     }
     
     private func observeBluetoothState() {
@@ -108,11 +108,8 @@ public final class Store: ObservableObject {
         guard let advertisement = MiBeacon(scanData.advertisementData) else {
             return false
         }
-        let oldValue = self.peripherals[scanData.peripheral]
-        if oldValue != advertisement {
-            self.peripherals[scanData.peripheral] = advertisement
-        }
-        return false
+        self.peripherals[scanData.peripheral, default: [:]][advertisement.frameCounter] = advertisement
+        return true
     }
     
     public func log(_ message: String) {
