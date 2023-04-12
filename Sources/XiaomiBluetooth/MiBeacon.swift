@@ -34,6 +34,16 @@ public struct MiBeacon: Equatable, Hashable {
     public let ioCapability: Capability.IO?
 }
 
+extension MiBeacon: Identifiable {
+    
+    public var id: String {
+        product.description
+        + "/"
+        + frameCounter.description
+        + (address.flatMap { "/" + $0.rawValue } ?? "")
+    }
+}
+
 public extension MiBeacon {
     
     var isEncrypted: Bool {
@@ -92,6 +102,7 @@ public extension MiBeacon {
             self.capability = nil
             self.ioCapability = nil
         }
+        
     }
 }
 
