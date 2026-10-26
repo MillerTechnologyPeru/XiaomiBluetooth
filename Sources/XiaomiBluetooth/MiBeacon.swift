@@ -57,13 +57,13 @@ public extension MiBeacon {
 
 public extension MiBeacon {
     
-    static var service: BluetoothUUID { .xiaomi }
+    static var service: BluetoothUUID { .bit16(0xFE95) }
     
     init?<T: GATT.AdvertisementData>(_ advertisementData: T) {
-        guard let serviceData = advertisementData.serviceData else {
+        guard let data = advertisementData.serviceData?[MiBeacon.service] else {
             return nil
         }
-        self.init(serviceData: serviceData)
+        self.init(data: Data(data))
     }
     
     init?(serviceData: [BluetoothUUID: Data]) {
