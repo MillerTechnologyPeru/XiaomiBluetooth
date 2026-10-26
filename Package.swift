@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 6.2
 import PackageDescription
 
 let package = Package(
@@ -18,11 +18,11 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/PureSwift/Bluetooth.git",
-            .upToNextMajor(from: "6.0.0")
+            from: "8.0.0"
         ),
         .package(
             url: "https://github.com/PureSwift/GATT.git",
-            .upToNextMajor(from: "3.0.0")
+            from: "4.0.0"
         ),
     ],
     targets: [
