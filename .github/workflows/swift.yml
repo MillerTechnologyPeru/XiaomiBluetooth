@@ -4,41 +4,41 @@ jobs:
 
   macos:
     name: macOS
-    runs-on: macos-latest
+    runs-on: macos-26
     steps:
-    - name: Install Swift
-      uses: slashmo/install-swift@v0.3.0
-      with:
-        version: 5.8
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
+    - name: Install Swift
+      run: |
+        curl -fsSLO https://download.swift.org/swiftly/darwin/swiftly.pkg
+        installer -pkg swiftly.pkg -target CurrentUserHomeDirectory
+        ~/.swiftly/bin/swiftly init --quiet-shell-followup --skip-install --assume-yes
+        ~/.swiftly/bin/swiftly install 6.4.1 --use --assume-yes
+        echo "$HOME/.swiftly/bin" >> $GITHUB_PATH
     - name: Swift Version
       run: swift --version
     - name: Build (Debug)
       run: swift build -c debug
     - name: Build (Release)
       run: swift build -c release
-    - name: Test
-      run: swift test
-  
+    - name: Test (Debug)
+      run: swift test -c debug
+
   linux:
     name: Linux
     strategy:
       matrix:
-        swift: [5.7.3, 5.8]
-    runs-on: ubuntu-20.04
+        swift: ["6.4.1"]
+    runs-on: ubuntu-latest
+    container: swift:${{ matrix.swift }}-noble
     steps:
-    - name: Install Swift
-      uses: slashmo/install-swift@v0.3.0
-      with:
-        version: ${{ matrix.swift }}
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Swift Version
       run: swift --version
     - name: Build (Debug)
       run: swift build -c debug
     - name: Build (Release)
       run: swift build -c release
-    - name: Test
-      run: swift test
+    - name: Test (Debug)
+      run: swift test -c debug
