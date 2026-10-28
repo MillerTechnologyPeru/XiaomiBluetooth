@@ -71,7 +71,7 @@ public final class Store: ObservableObject {
         stopScanning()
         isScanning = true
         let scanStream = central.scan(
-            with: [.xiaomi],
+            with: [MiBeacon.service],
             filterDuplicates: filterDuplicates
         )
         self.scanStream = scanStream
@@ -112,7 +112,7 @@ public final class Store: ObservableObject {
         return true
     }
     
-    public func log(_ message: String) {
+    nonisolated public func log(_ message: String) {
         print(message)
     }
 }

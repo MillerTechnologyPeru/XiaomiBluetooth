@@ -21,7 +21,7 @@ extension MockService {
     static var deviceInformation: MockService {
         Service(
             id: 10,
-            uuid: .deviceInformation,
+            uuid: BluetoothUUID.Service.deviceInformation,
             peripheral: .beacon
         )
     }
@@ -29,7 +29,7 @@ extension MockService {
     static var battery: MockService {
         Service(
             id: 20,
-            uuid: .batteryService,
+            uuid: BluetoothUUID.Service.battery,
             peripheral: .beacon
         )
     }
@@ -37,7 +37,7 @@ extension MockService {
     static var savantSystems: MockService {
         Service(
             id: 30,
-            uuid: .savantSystems2,
+            uuid: BluetoothUUID.Member.savantSystems2,
             peripheral: .smartThermostat
         )
     }
@@ -48,7 +48,7 @@ extension MockCharacteristic {
     static var deviceName: MockCharacteristic {
         Characteristic(
             id: 11,
-            uuid: .deviceName,
+            uuid: BluetoothUUID.Characteristic.deviceName,
             peripheral: .beacon,
             properties: [.read]
         )
@@ -57,7 +57,7 @@ extension MockCharacteristic {
     static var manufacturerName: MockCharacteristic {
         Characteristic(
             id: 12,
-            uuid: .manufacturerNameString,
+            uuid: BluetoothUUID.Characteristic.manufacturerNameString,
             peripheral: .beacon,
             properties: [.read]
         )
@@ -66,7 +66,7 @@ extension MockCharacteristic {
     static var modelNumber: MockCharacteristic {
         Characteristic(
             id: 13,
-            uuid: .modelNumberString,
+            uuid: BluetoothUUID.Characteristic.modelNumberString,
             peripheral: .beacon,
             properties: [.read]
         )
@@ -75,7 +75,7 @@ extension MockCharacteristic {
     static var serialNumber: MockCharacteristic {
         Characteristic(
             id: 14,
-            uuid: .serialNumberString,
+            uuid: BluetoothUUID.Characteristic.serialNumberString,
             peripheral: .beacon,
             properties: [.read]
         )
@@ -84,7 +84,7 @@ extension MockCharacteristic {
     static var batteryLevel: MockCharacteristic {
         Characteristic(
             id: 21,
-            uuid: .batteryLevel,
+            uuid: BluetoothUUID.Characteristic.batteryLevel,
             peripheral: .beacon,
             properties: [.read, .notify]
         )
@@ -104,7 +104,7 @@ extension MockDescriptor {
     static func clientCharacteristicConfiguration(_ peripheral: Peripheral) -> MockDescriptor {
         Descriptor(
             id: 99,
-            uuid: .clientCharacteristicConfiguration,
+            uuid: BluetoothUUID.Descriptor.clientCharacteristicConfiguration,
             peripheral: peripheral
         )
     }

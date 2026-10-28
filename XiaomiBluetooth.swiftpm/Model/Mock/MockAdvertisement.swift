@@ -18,7 +18,7 @@ public struct MockAdvertisementData: AdvertisementData {
     public let localName: String?
     
     /// The Manufacturer data of a peripheral.
-    public let manufacturerData: ManufacturerSpecificData?
+    public let manufacturerData: ManufacturerSpecificData<Data>?
     
     /// This value is available if the broadcaster (peripheral) provides its Tx power level in its advertising packet.
     /// Using the RSSI value and the Tx power level, it is possible to calculate path loss.
@@ -35,7 +35,7 @@ public struct MockAdvertisementData: AdvertisementData {
     
     internal init(
         localName: String? = nil,
-        manufacturerData: ManufacturerSpecificData? = nil,
+        manufacturerData: ManufacturerSpecificData<Data>? = nil,
         txPowerLevel: Double? = nil,
         serviceData: [BluetoothUUID : Data]? = nil,
         serviceUUIDs: [BluetoothUUID]? = nil,
@@ -55,7 +55,7 @@ public extension MockAdvertisementData {
     
     static let beacon = MockAdvertisementData(
         localName: nil,
-        manufacturerData: ManufacturerSpecificData(data: Data([0x4c, 0x00, 0x02, 0x15, 0xb9, 0x40, 0x7f, 0x30, 0xf5, 0xf8, 0x46, 0x6e, 0xaf, 0xf9, 0x25, 0x55, 0x6b, 0x57, 0xfe, 0x6d, 0x29, 0x4c, 0x90, 0x39, 0x74])),
+        manufacturerData: ManufacturerSpecificData<Data>(data: Data([0x4c, 0x00, 0x02, 0x15, 0xb9, 0x40, 0x7f, 0x30, 0xf5, 0xf8, 0x46, 0x6e, 0xaf, 0xf9, 0x25, 0x55, 0x6b, 0x57, 0xfe, 0x6d, 0x29, 0x4c, 0x90, 0x39, 0x74])),
         txPowerLevel: nil,
         serviceData: nil,
         serviceUUIDs: nil,
@@ -64,10 +64,10 @@ public extension MockAdvertisementData {
     
     static let savantThermostat = MockAdvertisementData(
         localName: "CLI-W200",
-        manufacturerData: ManufacturerSpecificData(data: Data([0xd9, 0x01, 0x01, 0x02, 0x00, 0x00, 0x8c, 0x85, 0x90, 0xcb, 0x31, 0x74, 0x00, 0x60])),
+        manufacturerData: ManufacturerSpecificData<Data>(data: Data([0xd9, 0x01, 0x01, 0x02, 0x00, 0x00, 0x8c, 0x85, 0x90, 0xcb, 0x31, 0x74, 0x00, 0x60])),
         txPowerLevel: nil,
         serviceData: nil,
-        serviceUUIDs: [.savantSystems2],
+        serviceUUIDs: [.bit16(0xFDA8)], // Savant Systems LLC,
         solicitedServiceUUIDs: nil
     )
 }
